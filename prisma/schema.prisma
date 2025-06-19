@@ -1,0 +1,60 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+        
+
+model User {
+  id        Int          @id @default(autoincrement())
+  email     String       @unique
+  name      String?
+  password  String
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  taskTables TaskTable[]
+}
+
+model TaskTable {
+  id          Int          @id @default(autoincrement())
+  name        String
+  description String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  userId      Int
+  user        User         @relation(fields: [userId], references: [id])
+  miniTables  MiniTable[]
+}
+
+model MiniTable {
+  id          Int          @id @default(autoincrement())
+  name        String       // np. "To Do", "In Progress", "Done"
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  taskTableId Int
+  taskTable   TaskTable    @relation(fields: [taskTableId], references: [id])
+  tasks       Task[]
+}
+
+model Task {
+  id           Int        @id @default(autoincrement())
+  title        String
+  description  String?
+  completed    Boolean    @default(false)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  miniTableId  Int
+  miniTable    MiniTable  @relation(fields: [miniTableId], references: [id])
+}
+
