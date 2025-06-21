@@ -45,3 +45,6 @@ next-env.d.ts
 /prisma/migrations
 /prisma/dev.db
 /prisma/seed.ts
+
+
+api/auth/
