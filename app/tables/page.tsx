@@ -14,7 +14,6 @@ export default function TablesPage() {
               </tr>
             </thead>
             <tbody>
-              {/* Example row */}
               <tr className="hover:bg-slate-50 transition-colors duration-200">
                 <td className="py-3 px-4">1</td>
                 <td className="py-3 px-4">Przykładowy element</td>

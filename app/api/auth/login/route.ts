@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { cookies } from 'next/headers';
 
 const prisma = new PrismaClient();
 
@@ -14,27 +15,34 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Znajdź użytkownika
     const user = await prisma.user.findUnique({
       where: { email }
     });
 
-    if (!user) {
+    if (!user || user.password !== password) {
       return NextResponse.json(
         { message: 'Nieprawidłowe dane logowania' },
         { status: 401 }
       );
     }
 
-    // Sprawdź hasło (tymczasowo bez hashowania)
-    if (user.password !== password) {
-      return NextResponse.json(
-        { message: 'Nieprawidłowe dane logowania' },
-        { status: 401 }
-      );
-    }
+  
 
-    // Wygeneruj prosty token
+
+    // Ustaw sesję jako JSON string
+    const cookieStore = await cookies();
+    const sessionData = JSON.stringify({
+      userId: user.id,
+      email: user.email,
+      name: user.name
+    });
+    
+    cookieStore.set('session', sessionData, {
+      httpOnly: true,
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 godziny
+      secure: process.env.NODE_ENV === 'production'
+    });
+
     const token = Buffer.from(`${user.id}:${user.email}:${Date.now()}`).toString('base64');
 
     return NextResponse.json({

@@ -10,13 +10,12 @@ interface TaskTableProps {
 export default function TaskTable({ params }: TaskTableProps) {
   const { userId, taskTableId } = params;
 
+  console.log("User ID:", userId);
+
   return (
      <main className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-          {/* Main Content */}
           <div className="container mx-auto px-6 py-8">
-            {/* Kanban Board */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              {/* To Do Column */}
               <div className="bg-white rounded-xl shadow-sm border border-slate-200">
                 <div className="p-4 border-b border-slate-200">
                   <div className="flex items-center justify-between">
@@ -50,8 +49,6 @@ export default function TaskTable({ params }: TaskTableProps) {
                   </div>
                 </div>
               </div>
-    
-              {/* In Progress Column */}
               <div className="bg-white rounded-xl shadow-sm border border-slate-200">
                 <div className="p-4 border-b border-slate-200">
                   <div className="flex items-center justify-between">
@@ -73,8 +70,6 @@ export default function TaskTable({ params }: TaskTableProps) {
                   </div>
                 </div>
               </div>
-    
-              {/* Done Column */}
               <div className="bg-white rounded-xl shadow-sm border border-slate-200">
                 <div className="p-4 border-b border-slate-200">
                   <div className="flex items-center justify-between">
