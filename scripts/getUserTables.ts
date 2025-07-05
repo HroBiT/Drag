@@ -1,46 +1,65 @@
-import { PrismaClient } from '@prisma/client';
-import { cookies } from 'next/headers';
+import { PrismaClient } from "@prisma/client";
+import { cookies } from "next/headers";
 
 const prisma = new PrismaClient();
 
 const getUserTables = async (userId: number) => {
-try {
+  try {
     const cookieStore = await cookies();
-    const session = cookieStore.get('session')?.value;
+    const session = cookieStore.get("session")?.value;
 
-    if(!session) {
-        return [];
+    if (!session) {
+      return [];
     }
 
     const userMainTables = await prisma.user.findUnique({
-        where: { id: userId,},
-        select: {
-            taskTables: {
-                select: {
-                    id: true, // Added id field
-                    name: true,
+      where: { id: userId },
+      select: {
+        taskTables: {
+          select: {
+            id: true, // Added id field
+            name: true,
+            description: true,
+            createdAt: true,
+            updatedAt: true,
+            miniTables: {
+              select: {
+                id: true,
+                name: true,
+                createdAt: true,
+                updatedAt: true,
+                taskTableId: true,
+                tasks: {
+                  select: {
+                    id: true,
+                    title: true,
                     description: true,
+                    completed: true,
                     createdAt: true,
                     updatedAt: true,
+                    miniTableId: true,
+                  },
                 },
-                orderBy: {
-                    updatedAt: 'desc',
-                },
-            }
-        }
-    })
+              },
+            },
+          },
+          orderBy: {
+            updatedAt: "desc",
+          },
+        },
+      },
+    });
 
-    if(!userMainTables) {
-        return [];
+    if (!userMainTables) {
+      return [];
     }
 
     // Fixed: Always return the taskTables
     return userMainTables.taskTables;
-
-}catch (error) {
-  console.error('Error fetching user tables:', error);
-  return [];
-}
-}
+  } catch (error) {
+    console.error("Error fetching user tables:", error);
+    return [];
+  }
+};
 
 export { getUserTables };
