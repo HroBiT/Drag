@@ -4,7 +4,6 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -15,7 +14,6 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
         
-
 model User {
   id        Int          @id @default(autoincrement())
   email     String       @unique
@@ -35,6 +33,7 @@ model TaskTable {
   userId      Int
   user        User         @relation(fields: [userId], references: [id])
   miniTables  MiniTable[]
+  tasks       Task[]
 }
 
 model MiniTable {
@@ -54,7 +53,9 @@ model Task {
   completed    Boolean    @default(false)
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
-  miniTableId  Int
-  miniTable    MiniTable  @relation(fields: [miniTableId], references: [id])
+  taskTableId  Int
+  taskTable    TaskTable  @relation(fields: [taskTableId], references: [id])
+  miniTableId  Int?       // Opcjonalne - task może nie być przypisany do mini tabeli
+  miniTable    MiniTable? @relation(fields: [miniTableId], references: [id])
+  State        Boolean    @default(false) // czy task jest przypisany do miniTable
 }
-

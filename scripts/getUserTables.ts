@@ -17,7 +17,7 @@ const getUserTables = async (userId: number) => {
       select: {
         taskTables: {
           select: {
-            id: true, // Added id field
+            id: true,
             name: true,
             description: true,
             createdAt: true,
@@ -30,6 +30,11 @@ const getUserTables = async (userId: number) => {
                 updatedAt: true,
                 taskTableId: true,
                 tasks: {
+                  where: {
+                    miniTableId: {
+                      not: null,
+                    },
+                  },
                   select: {
                     id: true,
                     title: true,
