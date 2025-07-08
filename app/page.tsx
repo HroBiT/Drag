@@ -23,10 +23,12 @@ export default async function Home() {
           </Button>
         </div>
       ) : (
-        <Link href="/login" className="justify-center flex">
+        <div>
           <p className="text-center mt-12">Go login first :)</p>
-          <Button className="mt-4">Go to Login</Button>
-        </Link>
+          <Link href="/login" className="justify-center flex">
+            <Button className="mt-4">Go to Login</Button>
+          </Link>
+        </div>
       )}
     </main>
   );

@@ -1,22 +1,11 @@
-"use client";
+import { getUnTakenTasks } from "@/scripts/PrismasScripts";
 
-interface Task {
-  id: number;
-  title: string;
-  description: string | null;
-  createdAt: Date;
-  completed: boolean;
-  State: boolean;
-  taskTableId: number;
-  miniTableId: number;
-  updatedAt: Date;
-}
-
-interface TaskListProps {
-  tasks: Task[];
-}
-
-export default function TaskList({ tasks }: TaskListProps) {
+export default async function TaskList({
+  tasktableId,
+}: {
+  tasktableId: number;
+}) {
+  const tasks = await getUnTakenTasks(tasktableId);
   return (
     <div>
       {tasks.map((task) => (

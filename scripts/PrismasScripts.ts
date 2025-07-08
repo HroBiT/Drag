@@ -94,7 +94,6 @@ const getUnTakenTasks = async (taskTableId: number) => {
 
     const unassignedTasks = await prisma.task.findMany({
       where: {
-        miniTableId: null,
         taskTableId: taskTableId,
         State: false,
       },

@@ -45,7 +45,7 @@ export default async function TaskTable({ params }: TaskTableProps) {
       <div className="container mx-auto px-6 py-8">
         <div className="flex flex-row justify-center gap-x-56 my-10">
           {MiniTables.map((table: any) => (
-            <div className="" key={table.id}>
+            <div className="border p-10" key={table.id}>
               <h3>{table.name}</h3>
               <p>{table.description}</p>
               <div className="flex flex-row gap-x-10 mt-4">
@@ -54,12 +54,16 @@ export default async function TaskTable({ params }: TaskTableProps) {
                     <h4>{miniTable.name}</h4>
                     <ul>
                       {miniTable.tasks?.map((task: any) => (
-                        <li key={task.id} className="mb-2">
+                        <li
+                          key={task.id}
+                          className="my-4 p-4 border rounded-2xl"
+                        >
+                          <h5 className=" font-bold">{task.title}</h5>
                           {task.name}
                           <p className="text-sm text-slate-500">
                             {task.description}
                           </p>
-                          <p className="text-xs text-slate-400">
+                          <p className="text-xs mt-[15px] text-slate-400">
                             Created at:
                             {new Date(task.createdAt).toLocaleDateString()}
                           </p>
@@ -72,6 +76,7 @@ export default async function TaskTable({ params }: TaskTableProps) {
             </div>
           ))}
         </div>
+        <hr className="my-6 font-bold" />
         {/* Add New Task Section */}
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
           <div className="flex items-center mb-4">

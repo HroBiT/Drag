@@ -31,8 +31,8 @@ const getUserTables = async (userId: number) => {
                 taskTableId: true,
                 tasks: {
                   where: {
-                    miniTableId: {
-                      not: null,
+                    NOT: {
+                      miniTableId: null,
                     },
                   },
                   select: {
