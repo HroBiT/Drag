@@ -1,4 +1,5 @@
 import { getSession } from "@/lib/auth";
+import prisma from "@/lib/prisma";
 
 export default async function makeTable(
   userId: number,
@@ -13,10 +14,7 @@ export default async function makeTable(
   }
 
   try {
-    const prisma = require("@prisma/client").PrismaClient;
-    const prismaClient = new prisma();
-
-    const newTable = await prismaClient.taskTable.create({
+    const newTable = await prisma.taskTable.create({
       data: {
         name: tableName,
         description: description,

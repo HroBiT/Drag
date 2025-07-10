@@ -3,11 +3,7 @@ import { getUserTables } from "@/scripts/getUserTables";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-interface UserTablesProps {
-  params: { userId: string };
-}
-
-export default async function UserTables({ params }: UserTablesProps) {
+export default async function UserTables() {
   const session = await getSession();
   console.log("session", session);
 
@@ -15,7 +11,6 @@ export default async function UserTables({ params }: UserTablesProps) {
     redirect("/login");
   }
 
-  // Instead of fetch, directly import and use the function
   const tables = await getUserTables(session.userId);
 
   if (!tables) {

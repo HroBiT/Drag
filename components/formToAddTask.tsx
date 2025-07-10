@@ -31,10 +31,8 @@ export default function FormToAddTask({ TableId }: FormToAddTaskProps) {
       });
 
       if (response.ok) {
-        // Reset form after successful submission
         setTitle("");
         setDescription("");
-        // Refresh the page to show the new task
         window.location.reload();
       } else {
         console.error("Failed to create task");

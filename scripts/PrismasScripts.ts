@@ -1,17 +1,83 @@
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/prisma";
 import { cookies } from "next/headers";
+import { unstable_cache } from "next/cache";
 
-const prisma = new PrismaClient();
+const getUnTakenTasksUncached = async (taskTableId: number) => {
+  try {
+    if (!taskTableId || isNaN(taskTableId)) {
+      console.error("Invalid taskTableId provided:", taskTableId);
+      return [];
+    }
+
+    const unassignedTasks = await prisma.task.findMany({
+      where: {
+        taskTableId: taskTableId,
+        State: false,
+      },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        completed: true,
+        createdAt: true,
+        updatedAt: true,
+        taskTableId: true,
+        miniTableId: true,
+        State: true,
+      },
+      orderBy: {
+        updatedAt: "desc",
+      },
+    });
+
+    return unassignedTasks;
+  } catch (error) {
+    console.error("Error getting unassigned tasks:", error);
+    throw error;
+  }
+};
+
+// Cache the unassigned tasks
+const getUnTakenTasks = unstable_cache(
+  getUnTakenTasksUncached,
+  ["untaken-tasks"],
+  {
+    revalidate: 60, // 1 minute
+    tags: ["tasks"],
+  }
+);
 
 const GetTasks = async (currentUserId: string): Promise<any[]> => {
   const taskData = await prisma.taskTable.findMany({
     where: {
-      userId: Number(currentUserId), // np. z sesji
+      userId: Number(currentUserId),
     },
-    include: {
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      createdAt: true,
+      updatedAt: true,
+      userId: true,
       miniTables: {
-        include: {
+        select: {
+          id: true,
+          name: true,
+          createdAt: true,
+          updatedAt: true,
+          taskTableId: true,
           tasks: {
+            select: {
+              id: true,
+              title: true,
+              description: true,
+              completed: true,
+              createdAt: true,
+              updatedAt: true,
+              taskTableId: true,
+              miniTableId: true,
+              State: true,
+            },
             orderBy: { updatedAt: "desc" },
           },
         },
@@ -30,10 +96,32 @@ const GetTaskTable = async (
       id: Number(taskTableId),
       userId: Number(currentUserId),
     },
-    include: {
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      createdAt: true,
+      updatedAt: true,
+      userId: true,
       miniTables: {
-        include: {
+        select: {
+          id: true,
+          name: true,
+          createdAt: true,
+          updatedAt: true,
+          taskTableId: true,
           tasks: {
+            select: {
+              id: true,
+              title: true,
+              description: true,
+              completed: true,
+              createdAt: true,
+              updatedAt: true,
+              taskTableId: true,
+              miniTableId: true,
+              State: true,
+            },
             orderBy: { updatedAt: "desc" },
           },
         },
@@ -43,19 +131,16 @@ const GetTaskTable = async (
 
   return taskTable;
 };
-//const userId:number
 
 const getCurrentUser = async (userId: number, email: string): Promise<any> => {
   try {
     const cookieStore = await cookies();
 
-    // Dekoduj token (format: userId:email:timestamp)
-
     if (!userId || !email) {
       return null;
     }
 
-    // Pobierz użytkownika z bazy
+    // Pobierz użytkownika z bazy z optymalizowanym select
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: {
@@ -63,10 +148,31 @@ const getCurrentUser = async (userId: number, email: string): Promise<any> => {
         email: true,
         name: true,
         taskTables: {
-          include: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            createdAt: true,
+            updatedAt: true,
             miniTables: {
-              include: {
+              select: {
+                id: true,
+                name: true,
+                createdAt: true,
+                updatedAt: true,
+                taskTableId: true,
                 tasks: {
+                  select: {
+                    id: true,
+                    title: true,
+                    description: true,
+                    completed: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    taskTableId: true,
+                    miniTableId: true,
+                    State: true,
+                  },
                   orderBy: { updatedAt: "desc" },
                 },
               },
@@ -81,31 +187,6 @@ const getCurrentUser = async (userId: number, email: string): Promise<any> => {
   } catch (error) {
     console.error("Error getting current user:", error);
     return null;
-  }
-};
-//Pobieranie dla danej tabeli nie przypisanych taskow
-
-const getUnTakenTasks = async (taskTableId: number) => {
-  try {
-    if (!taskTableId || isNaN(taskTableId)) {
-      console.error("Invalid taskTableId provided:", taskTableId);
-      return [];
-    }
-
-    const unassignedTasks = await prisma.task.findMany({
-      where: {
-        taskTableId: taskTableId,
-        State: false,
-      },
-      orderBy: {
-        updatedAt: "desc",
-      },
-    });
-
-    return unassignedTasks;
-  } catch (error) {
-    console.error("Error getting unassigned tasks:", error);
-    throw error;
   }
 };
 

@@ -1,8 +1,8 @@
 import Forms from "@/components/forms";
 import { getSession } from "@/lib/auth";
-import { getUserTables } from "@/scripts/getUserTables";
-import Link from "next/link";
+import { getSpecificTaskTable } from "@/scripts/getSpecificTaskTable";
 import { redirect } from "next/navigation";
+import DragDropProvider from "@/components/DragDropProvider";
 
 interface TaskTableProps {
   params: Promise<{
@@ -15,7 +15,6 @@ export default async function TaskTable({ params }: TaskTableProps) {
   const session = await getSession();
   console.log("session", session);
 
-  // Await params before using its properties
   const resolvedParams = await params;
   console.log("params:", resolvedParams);
   console.log(
@@ -29,27 +28,28 @@ export default async function TaskTable({ params }: TaskTableProps) {
     redirect("/login");
   }
 
-  // Instead of fetch, directly import and use the function
-  const tables = await getUserTables(session.userId);
+  const taskTable = await getSpecificTaskTable(
+    session.userId,
+    Number(resolvedParams.TaskTableId)
+  );
 
-  if (!tables) {
-    console.error("Failed to fetch user tables");
-    return <div>Error loading tables</div>;
+  if (!taskTable) {
+    console.error("Failed to fetch task table or table not found");
+    return <div>Error loading table or table not found</div>;
   }
 
-  console.log("userTables", tables);
-  const MiniTables = tables;
-  console.log("MiniTables", MiniTables);
+  console.log("taskTable", taskTable);
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       <div className="container mx-auto px-6 py-8">
-        <div className="flex flex-row justify-center gap-x-56 my-10">
-          {MiniTables.map((table: any) => (
-            <div className="border p-10" key={table.id}>
-              <h3>{table.name}</h3>
-              <p>{table.description}</p>
+        <DragDropProvider>
+          <div className="flex flex-row justify-center gap-x-56 my-10">
+            <div className="border p-10" key={taskTable.id}>
+              <h3>{taskTable.name}</h3>
+              <p>{taskTable.description}</p>
+
               <div className="flex flex-row gap-x-10 mt-4">
-                {table.miniTables?.map((miniTable: any) => (
+                {taskTable.miniTables?.map((miniTable: any) => (
                   <div key={miniTable.id}>
                     <h4>{miniTable.name}</h4>
                     <ul>
@@ -64,7 +64,7 @@ export default async function TaskTable({ params }: TaskTableProps) {
                             {task.description}
                           </p>
                           <p className="text-xs mt-[15px] text-slate-400">
-                            Created at:
+                            Created at:{" "}
                             {new Date(task.createdAt).toLocaleDateString()}
                           </p>
                         </li>
@@ -74,18 +74,18 @@ export default async function TaskTable({ params }: TaskTableProps) {
                 ))}
               </div>
             </div>
-          ))}
-        </div>
-        <hr className="my-6 font-bold" />
-        {/* Add New Task Section */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-          <div className="flex items-center mb-4">
-            <h2 className="text-xl font-semibold text-slate-800">
-              Dodaj nowe zadanie
-            </h2>
           </div>
-          <Forms TableId={Number(resolvedParams.TaskTableId)} />
-        </div>
+          <hr className="my-6 font-bold" />
+          {/* Add New Task Section */}
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <div className="flex items-center mb-4">
+              <h2 className="text-xl font-semibold text-slate-800">
+                Dodaj nowe zadanie
+              </h2>
+            </div>
+            <Forms TableId={Number(resolvedParams.TaskTableId)} />
+          </div>
+        </DragDropProvider>
       </div>
     </main>
   );
