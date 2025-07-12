@@ -16,12 +16,9 @@ export default async function Forms({ TableId }: FormsProps) {
   }
 
   return (
-    <div>
+    <div className="">
       <div>
         <FormToAddTask TableId={TableId} />
-      </div>
-      <div>
-        <TaskList tasktableId={TableId} />
       </div>
     </div>
   );

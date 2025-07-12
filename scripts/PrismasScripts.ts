@@ -190,4 +190,27 @@ const getCurrentUser = async (userId: number, email: string): Promise<any> => {
   }
 };
 
-export { GetTasks, GetTaskTable, getCurrentUser, getUnTakenTasks };
+//update stanu tasku itd
+const updateTaskState = async (taskId: number, miniTableId: number | null) => {
+  try {
+    const updatedTask = await prisma.task.update({
+      where: { id: taskId },
+      data: {
+        miniTableId: miniTableId,
+        updatedAt: new Date(),
+      },
+    });
+    return updatedTask;
+  } catch (error) {
+    console.error("Error updating task state:", error);
+    throw error;
+  }
+};
+
+export {
+  GetTasks,
+  GetTaskTable,
+  getCurrentUser,
+  getUnTakenTasks,
+  updateTaskState,
+};

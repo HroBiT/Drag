@@ -34,6 +34,8 @@ export default function FormToAddTask({ TableId }: FormToAddTaskProps) {
         setTitle("");
         setDescription("");
         window.location.reload();
+        setDescription("");
+        window.location.reload();
       } else {
         console.error("Failed to create task");
       }
